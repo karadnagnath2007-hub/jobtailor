@@ -6,5 +6,6 @@ export default defineConfig({
   site: 'https://jobtailor.pages.dev',
   output: 'server',
   adapter: cloudflare(),
+  image: { service: { entrypoint: 'astro/assets/services/noop' } },
   integrations: [react()],
 });

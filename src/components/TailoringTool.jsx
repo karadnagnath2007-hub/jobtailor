@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const tabs = [
   { key: 'bullets', label: '📄 Resume Bullets' },
@@ -28,43 +27,13 @@ async function callTailorAPI(jobDesc, background, tone, role) {
   }
 
   // Direct client-side call (for static builds)
-  const apiKey = import.meta.env.PUBLIC_GEMINI_API_KEY;
-  if (!apiKey) {
-    // Return mock data for demo if no key
-    return getMockResult();
-  }
-
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
-  const prompt = `You are an expert resume writer and career coach. Given a job description and a candidate's background, provide:
-
-1. ATS-optimized resume bullet points (4-6 bullets)
-2. A personalized cover letter (3-4 paragraphs)
-3. Interview talking points (5 key points with example answers)
-4. An ATS match score (0-100) with specific missing keywords
-
-Return ONLY valid JSON in this exact format:
-{
-  "bullets": ["string"],
-  "coverLetter": "string",
-  "interview": [{"question": "string", "answer": "string"}],
-  "atsScore": { "score": number, "missingKeywords": ["string"] }
-}
-
-Job Description: ${jobDesc}
-Candidate Background: ${background}
-Tone: ${tone || 'professional'}
-${role ? `Target Role: ${role}` : ''}`;
-
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const text = response.text();
-
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('Failed to parse AI response');
-
-  return JSON.parse(jsonMatch[0]);
+  const res = await fetch("/api/tailor", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jobDescription: jobDesc, resume: background }),
+  });
+  const { result } = await res.json();
+  return result;
 }
 
 function getMockResult() {
