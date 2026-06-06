@@ -1,0 +1,10 @@
+{
+  "name": "Software Engineer",
+  "slug": "software-engineer",
+  "description": "Software engineers design, develop, and maintain software systems. They work with programming languages, frameworks, and tools to build applications, APIs, and infrastructure that powers modern technology.",
+  "bullets": [
+    "Developed and deployed scalable microservices architecture handling 2M+ daily requests using Node.js and Kubernetes",
+    "Reduced API latency by 45% through strategic caching implementation and database query optimization",
+    "Led migration from monolithic application to distributed services, improving deployment frequency by 300%"
+  ]
+}

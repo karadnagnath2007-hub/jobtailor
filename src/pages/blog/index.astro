@@ -1,0 +1,110 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+
+const posts = await getCollection('blog');
+posts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+---
+
+<Base title="Blog — JobTailor AI" description="Tips, guides, and strategies to help you land more interviews and beat the ATS.">
+  <Nav />
+  <main>
+    <section class="blog-hero">
+      <div class="container" style="padding-top: 140px; padding-bottom: 48px;">
+        <h1 style="font-family: 'Fraunces', serif; font-size: 56px; line-height: 64px; color: var(--forest); margin-bottom: 16px;">
+          The JobTailor Blog
+        </h1>
+        <p style="font-size: 18px; line-height: 28px; color: var(--muted); max-width: 600px;">
+          Tips, guides, and strategies to help you land more interviews and beat the ATS.
+        </p>
+      </div>
+    </section>
+
+    <section class="blog-grid-section">
+      <div class="container">
+        <div class="blog-grid">
+          {posts.map((post) => (
+            <a href={`/blog/${post.slug}`} class="blog-card">
+              <p class="blog-meta">{post.data.date} · {post.data.readingTime}</p>
+              <h2 class="blog-card-title">{post.data.title}</h2>
+              <p class="blog-card-desc">{post.data.description}</p>
+              <span class="blog-read">Read article →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  main {
+    min-height: 100vh;
+  }
+
+  .blog-grid-section {
+    padding-bottom: 80px;
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+  }
+
+  .blog-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .blog-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .blog-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .blog-card-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    line-height: 30px;
+    color: var(--forest);
+    margin-bottom: 12px;
+  }
+
+  .blog-card-desc {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    line-height: 24px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    flex: 1;
+  }
+
+  .blog-read {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--forest);
+  }
+
+  @media (max-width: 768px) {
+    .blog-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

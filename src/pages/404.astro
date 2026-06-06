@@ -1,0 +1,58 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base title="Page Not Found — JobTailor AI" description="The page you're looking for doesn't exist.">
+  <Nav />
+  <main class="error-page">
+    <div class="error-container">
+      <h1 class="error-code">404</h1>
+      <p class="error-title">Page not found</p>
+      <p class="error-text">The page you're looking for doesn't exist or has been moved.</p>
+      <a href="/" class="btn-primary">Back to homepage</a>
+    </div>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .error-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 140px 24px 80px;
+  }
+
+  .error-container {
+    max-width: 480px;
+    text-align: center;
+  }
+
+  .error-code {
+    font-family: 'DM Mono', monospace;
+    font-size: 96px;
+    line-height: 1;
+    color: var(--forest);
+    opacity: 0.2;
+    margin-bottom: 16px;
+  }
+
+  .error-title {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    line-height: 40px;
+    color: var(--forest);
+    margin-bottom: 12px;
+  }
+
+  .error-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 16px;
+    line-height: 26px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+</style>

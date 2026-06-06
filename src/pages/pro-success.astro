@@ -1,0 +1,71 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base title="You're now Pro — JobTailor AI" description="Your Pro subscription is active. Enjoy unlimited resume tailoring sessions.">
+  <Nav />
+  <main class="success-page">
+    <div class="success-container">
+      <div class="success-icon">🎉</div>
+      <h1 class="success-title">You're now Pro</h1>
+      <p class="success-text">Unlimited sessions unlocked. Tailor as many resumes and cover letters as you need.</p>
+      <a href="/" class="btn-gold success-btn">Start tailoring →</a>
+    </div>
+  </main>
+  <Footer />
+</Base>
+
+<script>
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('jobtailor_pro', 'true');
+  }
+</script>
+
+<style>
+  .success-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 140px 24px 80px;
+  }
+
+  .success-container {
+    max-width: 480px;
+    text-align: center;
+  }
+
+  .success-icon {
+    font-size: 64px;
+    margin-bottom: 24px;
+  }
+
+  .success-title {
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    line-height: 56px;
+    color: var(--forest);
+    margin-bottom: 16px;
+  }
+
+  .success-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px;
+    line-height: 28px;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  .success-btn {
+    display: inline-flex;
+  }
+
+  @media (max-width: 768px) {
+    .success-title {
+      font-size: 36px;
+      line-height: 44px;
+    }
+  }
+</style>

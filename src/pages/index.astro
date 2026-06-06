@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import Pricing from '../components/Pricing.astro';
+import FAQ from '../components/FAQ.astro';
+import Footer from '../components/Footer.astro';
+import TailoringTool from '../components/TailoringTool.jsx';
+---
+
+<Base title="JobTailor AI — Tailor Your Resume. Land the Interview." description="Paste any job description and your background. Get ATS-optimized resume bullets, a cover letter, and interview prep in 30 seconds. Free to start.">
+  <Nav />
+  <Hero />
+  <HowItWorks />
+  <TailoringTool client:load defaultTab="bullets" />
+  <Pricing />
+  <FAQ />
+  <Footer />
+</Base>

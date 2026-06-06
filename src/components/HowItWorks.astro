@@ -1,0 +1,103 @@
+---
+---
+
+<section class="how" id="how-it-works">
+  <div class="how-container">
+    <h2 class="how-title">How it works</h2>
+    <div class="how-grid">
+      <div class="how-card">
+        <span class="how-number">01</span>
+        <div class="how-icon">📋</div>
+        <h3 class="how-card-title">Paste the job description</h3>
+        <p class="how-card-text">Drop in the full job posting. Our AI reads every requirement, keyword, and qualification.</p>
+      </div>
+      <div class="how-card">
+        <span class="how-number">02</span>
+        <div class="how-icon">👤</div>
+        <h3 class="how-card-title">Add your background</h3>
+        <p class="how-card-text">Paste your resume or a quick experience summary. No formatting needed — just the facts.</p>
+      </div>
+      <div class="how-card">
+        <span class="how-number">03</span>
+        <div class="how-icon">📦</div>
+        <h3 class="how-card-title">Get your full kit</h3>
+        <p class="how-card-text">Receive ATS-optimized bullets, a tailored cover letter, interview prep, and your ATS match score.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .how {
+    background: var(--cream2);
+    padding: 80px 0;
+  }
+
+  .how-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .how-title {
+    font-family: 'Fraunces', serif;
+    font-size: 56px;
+    line-height: 64px;
+    color: var(--forest);
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  .how-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: var(--shadow);
+  }
+
+  .how-number {
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    color: var(--muted);
+    opacity: 0.4;
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .how-icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+
+  .how-card-title {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    line-height: 32px;
+    color: var(--forest);
+    margin-bottom: 12px;
+  }
+
+  .how-card-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    line-height: 24px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 768px) {
+    .how-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .how-title {
+      font-size: 40px;
+      line-height: 48px;
+    }
+  }
+</style>

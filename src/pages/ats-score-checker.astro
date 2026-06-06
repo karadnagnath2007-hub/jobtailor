@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import TailoringTool from '../components/TailoringTool.jsx';
+---
+
+<Base title="Free ATS Score Checker — See If Your Resume Passes Filters" description="Check your resume's ATS score free. Find missing keywords, fix formatting issues, and get specific improvements — powered by AI.">
+  <Nav />
+  <main>
+    <section class="tool-hero">
+      <div class="container text-center" style="padding-top: 140px; padding-bottom: 48px;">
+        <h1 style="font-family: 'Fraunces', serif; font-size: 56px; line-height: 64px; color: var(--forest); margin-bottom: 16px;">
+          Does your resume pass the ATS filter?
+        </h1>
+        <p style="font-size: 18px; line-height: 28px; color: var(--muted); max-width: 600px; margin: 0 auto;">
+          80% of Fortune 500 companies filter resumes automatically before a human sees them. Check yours free.
+        </p>
+      </div>
+    </section>
+    <TailoringTool client:load defaultTab="score" />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  main {
+    min-height: 100vh;
+  }
+</style>

@@ -1,0 +1,160 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import TailoringTool from '../../components/TailoringTool.jsx';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+---
+
+<Base title={`${post.data.title} — JobTailor AI`} description={post.data.description}>
+  <Nav />
+  <main>
+    <article class="article">
+      <div class="container article-container">
+        <header class="article-header">
+          <p class="article-meta">{post.data.date} · {post.data.readingTime}</p>
+          <h1 class="article-title">{post.data.title}</h1>
+          <p class="article-desc">{post.data.description}</p>
+        </header>
+
+        <div class="article-body">
+          <Content />
+        </div>
+
+        <div class="article-cta">
+          <h2 class="article-cta-title">Try it yourself — tailor your resume now</h2>
+          <TailoringTool client:load />
+        </div>
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  main {
+    min-height: 100vh;
+  }
+
+  .article {
+    padding-top: 140px;
+    padding-bottom: 80px;
+  }
+
+  .article-container {
+    max-width: 720px;
+  }
+
+  .article-header {
+    margin-bottom: 48px;
+  }
+
+  .article-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .article-title {
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    line-height: 56px;
+    color: var(--forest);
+    margin-bottom: 16px;
+  }
+
+  .article-desc {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px;
+    line-height: 28px;
+    color: var(--muted);
+  }
+
+  .article-body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 16px;
+    line-height: 28px;
+    color: var(--ink);
+  }
+
+  .article-body :global(h2) {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    line-height: 36px;
+    color: var(--forest);
+    margin-top: 48px;
+    margin-bottom: 16px;
+  }
+
+  .article-body :global(h3) {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    line-height: 30px;
+    color: var(--forest);
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+
+  .article-body :global(p) {
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+
+  .article-body :global(ul),
+  .article-body :global(ol) {
+    margin-bottom: 20px;
+    padding-left: 24px;
+  }
+
+  .article-body :global(li) {
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+
+  .article-body :global(strong) {
+    color: var(--forest);
+    font-weight: 600;
+  }
+
+  .article-body :global(blockquote) {
+    border-left: 3px solid var(--gold);
+    padding-left: 20px;
+    margin: 24px 0;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .article-cta {
+    margin-top: 80px;
+    padding-top: 64px;
+    border-top: 1px solid var(--cream2);
+  }
+
+  .article-cta-title {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    line-height: 36px;
+    color: var(--forest);
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 768px) {
+    .article-title {
+      font-size: 32px;
+      line-height: 40px;
+    }
+  }
+</style>
