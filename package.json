@@ -9,6 +9,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^11.0.0",
     "@astrojs/react": "^3.6.0",
     "astro": "^4.16.0",
     "react": "^18.3.0",
