@@ -1,10 +1,10 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
-import netlify from '@astrojs/netlify';
+import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
-  site: 'https://jobtailor.netlify.app',
+  site: 'https://jobtailor.pages.dev',
   output: 'server',
-  adapter: netlify(),
+  adapter: cloudflare(),
   integrations: [react()],
 });

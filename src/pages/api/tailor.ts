@@ -1,9 +1,9 @@
 import type { APIRoute } from 'astro';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const apiKey = import.meta.env.GEMINI_API_KEY;
+
     if (!apiKey) {
       return new Response(
         JSON.stringify({ error: 'Gemini API key not configured' }),
@@ -21,52 +21,69 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const prompt = `You are an expert career coach and ATS optimization specialist.
+Tone preference: ${tone || 'professional'}
+${role ? `Target role: ${role}` : ''}
 
-    const prompt = `You are an expert resume writer and career coach. Given a job description and a candidate's background, provide:
+JOB DESCRIPTION:
+${jobDesc}
 
-1. ATS-optimized resume bullet points (4-6 bullets)
-2. A personalized cover letter (3-4 paragraphs)
-3. Interview talking points (5 key points with example answers)
-4. An ATS match score (0-100) with specific missing keywords
+CANDIDATE BACKGROUND:
+${background}
 
-Return ONLY valid JSON in this exact format:
-{
-  "bullets": ["string"],
-  "coverLetter": "string",
-  "interview": [{"question": "string", "answer": "string"}],
-  "atsScore": { "score": number, "missingKeywords": ["string"] }
-}
+Respond using EXACTLY these section headers:
 
-Job Description: ${jobDesc}
-Candidate Background: ${background}
-Tone: ${tone || 'professional'}
-${role ? `Target Role: ${role}` : ''}`;
+## Resume Bullets
+Write 6-8 achievement-focused bullet points tailored to this specific job. Start each with a strong action verb. Include realistic metrics.
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+## Cover Letter
+Write a 3-paragraph cover letter. No placeholder brackets. Make it specific to this role.
 
-    // Extract JSON from the response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+## Interview Talking Points
+Give 4-5 talking points formatted as: "When asked about [topic], highlight [specific point]."
+
+## Keywords
+Strong: [keyword1], [keyword2], [keyword3]
+Missing: [keyword1], [keyword2]
+Improve: [keyword1], [keyword2]
+
+## ATS Score: [number 0-100]
+Be realistic. Most people score 40-75.`;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const err = await response.json();
       return new Response(
-        JSON.stringify({ error: 'Failed to parse AI response' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: err.error?.message || 'Gemini API error' }),
+        { status: response.status, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    const parsed = JSON.parse(jsonMatch[0]);
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    return new Response(JSON.stringify(parsed), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ success: true, text }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ error: 'Something went wrong' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
