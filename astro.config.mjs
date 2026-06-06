@@ -1,10 +1,10 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
-import vercel from '@astrojs/vercel/serverless';
+import netlify from '@astrojs/netlify';
 
 export default defineConfig({
-  site: 'https://jobtailor.vercel.app',
+  site: 'https://jobtailor.netlify.app',
   output: 'server',
-  adapter: vercel(),
+  adapter: netlify(),
   integrations: [react()],
 });
