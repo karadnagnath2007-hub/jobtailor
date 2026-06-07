@@ -86,7 +86,7 @@ export default function TailoringTool({ defaultTab = 'bullets', defaultRole = ''
   const handleGenerate = async () => {
     setError('');
 
-    if (!isPro && usageCount >= 2) {
+    if (!isPro && usageCount >= 100) {
       setShowModal(true);
       return;
     }
