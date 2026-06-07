@@ -1,5 +1,7 @@
+.env.local
 .env
 node_modules/
+.wrangler/
 dist/
-.astro/
-.vercel/
+.DS_Store
+*.log

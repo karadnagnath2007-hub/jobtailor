@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://jobtailor.ai/sitemap-index.xml
