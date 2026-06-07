@@ -196,7 +196,7 @@ export default function TailoringTool({ defaultTab = 'bullets', defaultRole = ''
               <span className="tt-pro">Pro — unlimited sessions</span>
             ) : (
               <>
-                <span>{usageCount} of 2 free sessions used</span>
+                <span>{usageCount} of 100 free sessions used</span>
                 {usageCount >= 1 && (
                   <span className="tt-usage-hint">
                     {' '}
