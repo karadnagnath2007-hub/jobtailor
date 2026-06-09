@@ -48,6 +48,13 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- Site Banner -->
+  <div id="site-banner" class="site-banner" hidden role="alert" aria-live="polite">
+    <div class="site-banner-inner">
+      <span id="site-banner-text"></span>
+      <button class="site-banner-close" onclick="closeBanner()" aria-label="Dismiss">&times;</button>
+    </div>
+  </div>
   <!-- Navigation -->
   <nav class="nav" role="navigation" aria-label="Main navigation">
     <div class="nav-inner">
@@ -57,6 +64,7 @@
       </a>
       <div class="nav-links">
         <a href="#how-it-works">How it works</a>
+        <a href="#contact">Contact</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
       </div>
@@ -229,7 +237,7 @@
             <li>Culture fit analysis</li>
             <li>Red flag detection</li>
           </ul>
-          <a href="#stripe-link" class="btn btn-gold btn-full">Upgrade to Pro &rarr;</a>
+          <a href="#" onclick="openCheckout(); return false;" class="btn btn-gold btn-full">Upgrade to Pro &rarr;</a>
         </div>
 
         <!-- Teams Plan -->
@@ -242,7 +250,7 @@
             <li>Priority support</li>
             <li>Shared team dashboard</li>
           </ul>
-          <a href="#stripe-link" class="btn btn-primary btn-full">Join waitlist &rarr;</a>
+          <a href="#contact" class="btn btn-primary btn-full">Get in touch &rarr;</a>
           <p class="pricing-coming-soon">(Coming soon &mdash; join waitlist)</p>
         </div>
       </div>
@@ -323,6 +331,39 @@
     </div>
   </section>
 
+
+  <!-- Contact Section -->
+  <section id="contact" class="contact-section" aria-labelledby="contact-heading">
+    <div class="section-inner">
+      <div class="contact-header">
+        <h2 id="contact-heading" class="section-heading">Get in touch</h2>
+        <p class="section-subtext-dark">Questions about Teams, feedback, or just want to say hi? We read every message.</p>
+      </div>
+      <form class="contact-form" id="contact-form" novalidate>
+        <div class="contact-form-row">
+          <div class="contact-field">
+            <label for="contact-name">Your name</label>
+            <input type="text" id="contact-name" placeholder="Alex Chen" autocomplete="name" minlength="2" required>
+          </div>
+          <div class="contact-field">
+            <label for="contact-email">Email address</label>
+            <input type="email" id="contact-email" placeholder="alex@email.com" autocomplete="email" required>
+          </div>
+        </div>
+        <div class="contact-field">
+          <label for="contact-message">
+            Message
+            <span class="contact-char-count" id="contact-char-count">0 / 2000</span>
+          </label>
+          <textarea id="contact-message" rows="6" placeholder="What&#39;s on your mind?" maxlength="2000" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-gold btn-lg" id="contact-submit-btn">Send message &rarr;</button>
+        <p class="contact-success" id="contact-success" hidden>&check; Message sent! We&#39;ll get back to you within 24 hours.</p>
+        <p class="contact-error"   id="contact-error"   hidden></p>
+      </form>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer class="footer" role="contentinfo">
     <div class="footer-inner">
@@ -334,7 +375,7 @@
       <nav class="footer-links" aria-label="Footer navigation">
         <a href="#tool">Try free</a>
         <a href="#pricing">Pricing</a>
-        <a href="mailto:hello@jobtailor.ai">Contact</a>
+        <a href="#contact">Contact</a>
       </nav>
       <p class="footer-legal">&copy; 2026 JobTailor AI. Made with care for job seekers.</p>
     </div>
@@ -369,7 +410,7 @@
         <li>&check; Culture Fit Analysis</li>
         <li>&check; 10+ Interview Questions (behavioral, situational, technical)</li>
       </ul>
-      <a href="#stripe-link" class="btn btn-gold btn-lg">Upgrade to Pro &mdash; $6/mo &rarr;</a>
+      <a href="#" onclick="openCheckout(); return false;" class="btn btn-gold btn-lg">Upgrade to Pro &mdash; $6/mo &rarr;</a>
       <p class="modal-fine-print">Cancel anytime. No contracts.</p>
     </div>
   </div>

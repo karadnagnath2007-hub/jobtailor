@@ -762,3 +762,184 @@ function escapeHtml(text) {
   div.textContent = text;
   return div.innerHTML;
 }
+
+// ============================================
+// LEMON SQUEEZY + CONTACT — Added
+// ============================================
+
+// Page load: handle LS redirect + wire contact form
+;(function () {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('ls_success')) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+    startProPolling();
+  } else if (params.has('canceled')) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+    showBanner('Payment canceled — you can try again anytime.', 'info');
+  }
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Contact form submit
+  const form = document.getElementById('contact-form');
+  if (form) form.addEventListener('submit', submitContact);
+
+  // Contact char counter
+  const ta = document.getElementById('contact-message');
+  const cc = document.getElementById('contact-char-count');
+  if (ta && cc) ta.addEventListener('input', () => { cc.textContent = `${ta.value.length} / 2000`; });
+});
+
+// ── NULL-SAFETY PATCH for displayResults ──────────────────────────────────────
+// Wrap the original displayResults to guard against undefined data
+const _originalDisplayResults = displayResults;
+window.displayResults = function (data, tier) {
+  if (!data || typeof data !== 'object') {
+    showError('The AI returned an unexpected response. Please try again — it usually works on the second attempt.');
+    return;
+  }
+  // Safe fallbacks so partial responses never crash tab renderers
+  const safe = {
+    resumeBullets:    Array.isArray(data.resumeBullets)    ? data.resumeBullets    : [],
+    coverLetter:      data.coverLetter      || '',
+    atsScore:         data.atsScore         || { score: 0, missingKeywords: [] },
+    interviewPrep:    data.interviewPrep    || {},
+    linkedinSummary:  data.linkedinSummary  || '',
+    skillsGap:        data.skillsGap        || {},
+    redFlags:         Array.isArray(data.redFlags) ? data.redFlags : [],
+    salaryNegotiation:data.salaryNegotiation|| {},
+    plan306090:       data.plan306090       || {},
+    cultureFit:       data.cultureFit       || {},
+    overallReadiness: data.overallReadiness || {},
+  };
+  _originalDisplayResults(safe, tier);
+};
+
+// ── LEMON SQUEEZY CHECKOUT ────────────────────────────────────────────────────
+async function openCheckout() {
+  const fingerprint = getOrCreateFingerprint();
+  const token       = localStorage.getItem('jt_token') || '';
+
+  const btns = document.querySelectorAll('[onclick*="openCheckout"]');
+  btns.forEach(b => {
+    b.dataset.origText = b.textContent;
+    b.textContent = 'Redirecting to checkout…';
+    b.classList.add('checkout-loading');
+  });
+
+  try {
+    const res  = await fetch('/api/ls-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fingerprint, token }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.url) throw new Error(data.error || 'Could not start checkout.');
+    window.location.href = data.url;
+  } catch (err) {
+    btns.forEach(b => {
+      b.textContent = b.dataset.origText || 'Upgrade to Pro';
+      b.classList.remove('checkout-loading');
+    });
+    showBanner('Could not start checkout. Please try again.', 'error');
+  }
+}
+
+// ── PRO POLLING (runs after LS redirects back) ────────────────────────────────
+let _pollTimer = null;
+let _pollCount = 0;
+
+function startProPolling() {
+  const fp = getOrCreateFingerprint();
+  showBanner('Payment received — activating your Pro account…', 'info');
+  _pollCount = 0;
+  _pollTimer = setInterval(async () => {
+    _pollCount++;
+    try {
+      const res  = await fetch(`/api/check-pro?fp=${encodeURIComponent(fp)}`);
+      const data = await res.json();
+      if (data.found && data.tier === 'pro' && data.proToken) {
+        clearInterval(_pollTimer);
+        activatePro(data.proToken);
+        return;
+      }
+    } catch (_) {}
+    if (_pollCount >= 20) {
+      clearInterval(_pollTimer);
+      showBanner('Payment confirmed! Refresh if Pro features are not active yet.', 'info');
+    }
+  }, 3000);
+}
+
+function activatePro(proToken) {
+  localStorage.setItem('jt_token', proToken);
+  localStorage.setItem('jt_tier', 'pro');
+  updateUsageDisplay(Infinity);
+  showBanner('🎉 Welcome to Pro! All 11 features are now unlocked.', 'success');
+  setTimeout(closeBanner, 9000);
+}
+
+// ── BANNER ────────────────────────────────────────────────────────────────────
+function showBanner(message, type = 'info') {
+  const banner = document.getElementById('site-banner');
+  const text   = document.getElementById('site-banner-text');
+  if (!banner || !text) return;
+  text.textContent  = message;
+  banner.className  = `site-banner banner-${type}`;
+  banner.hidden     = false;
+  document.body.style.paddingTop = banner.offsetHeight + 'px';
+}
+
+function closeBanner() {
+  const banner = document.getElementById('site-banner');
+  if (!banner) return;
+  banner.hidden = true;
+  document.body.style.paddingTop = '';
+}
+
+// ── CONTACT FORM ──────────────────────────────────────────────────────────────
+async function submitContact(e) {
+  e.preventDefault();
+  const name    = (document.getElementById('contact-name')?.value    || '').trim();
+  const email   = (document.getElementById('contact-email')?.value   || '').trim();
+  const message = (document.getElementById('contact-message')?.value || '').trim();
+  const btn     = document.getElementById('contact-submit-btn');
+  const ok      = document.getElementById('contact-success');
+  const err     = document.getElementById('contact-error');
+
+  if (ok)  ok.hidden  = true;
+  if (err) err.hidden = true;
+
+  if (!name || !email || !message) {
+    if (err) { err.textContent = 'Please fill in all fields.'; err.hidden = false; } return;
+  }
+  if (!email.includes('@')) {
+    if (err) { err.textContent = 'Please enter a valid email address.'; err.hidden = false; } return;
+  }
+
+  const orig = btn.textContent;
+  btn.textContent = 'Sending…';
+  btn.disabled    = true;
+
+  try {
+    const res  = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, message }),
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      if (ok) ok.hidden = false;
+      document.getElementById('contact-form').reset();
+      const cc = document.getElementById('contact-char-count');
+      if (cc) cc.textContent = '0 / 2000';
+    } else {
+      throw new Error(data.error || 'Failed to send.');
+    }
+  } catch (ex) {
+    if (err) { err.textContent = ex.message; err.hidden = false; }
+  } finally {
+    btn.textContent = orig;
+    btn.disabled    = false;
+  }
+}
