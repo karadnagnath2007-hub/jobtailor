@@ -1,6 +1,6 @@
 # JobTailor AI
 
-AI-powered resume tailoring tool. Paste a job description and your background to get ATS-optimized resume bullets, a tailored cover letter, deep interview preparation, LinkedIn summary rewrite, skills gap analysis, salary negotiation script, 30-60-90 day plan, and culture fit analysis.
+AI-powered resume tailoring tool. Paste a job description and your background to get ATS-optimized resume bullets, a tailored cover letter, deep interview preparation, LinkedIn summary rewrite, skills gap analysis, salary negotiation script, 30-60-90 day plan, and culture fit analysis..
 
 ## Features
 
