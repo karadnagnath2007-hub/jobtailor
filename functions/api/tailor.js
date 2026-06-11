@@ -53,50 +53,77 @@ export async function onRequestPost(context) {
     }
   }
 
-  // ─── CALL GEMINI ──────────────────────────────────────────────────────────────
+  // ─── CALL GEMINI WITH CASCADE FALLBACK ───────────────────────────────────────
   const prompt = buildPrompt(jobDesc, background, tone, tier);
-  let geminiResponse;
 
-  try {
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: tier === 'pro' ? 8192 : tier === 'email' ? 4096 : 2048,
-          }
-        })
+  const MODELS = [
+    'gemini-2.5-flash-preview-05-20',
+    'gemini-2.5-flash-lite-preview-06-17',
+    'gemma-3-27b-it',
+  ];
+
+  let geminiResponse = null;
+  let lastError = null;
+
+  for (const model of MODELS) {
+    try {
+      const geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: tier === 'pro' ? 8192 : tier === 'email' ? 4096 : 2048,
+            }
+          })
+        }
+      );
+
+      if (geminiRes.status === 429) {
+        console.warn(`Rate limited on ${model}, trying next...`);
+        lastError = '429';
+        continue;
       }
-    );
 
-    if (!geminiRes.ok) {
-      const errText = await geminiRes.text();
-      console.error('Gemini HTTP error:', geminiRes.status, errText.slice(0, 300));
-      return json({ error: 'AI service error. Please try again.' }, 502);
+      if (!geminiRes.ok) {
+        const errText = await geminiRes.text();
+        console.error(`${model} HTTP error:`, geminiRes.status, errText.slice(0, 300));
+        lastError = errText;
+        continue;
+      }
+
+      const geminiJson = await geminiRes.json();
+      const rawText = geminiJson?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+      if (!rawText) {
+        console.error(`${model} returned empty text. Full response:`, JSON.stringify(geminiJson).slice(0, 500));
+        lastError = 'empty';
+        continue;
+      }
+
+      geminiResponse = extractJSON(rawText);
+
+      if (!geminiResponse) {
+        console.error(`${model} JSON parse failed. Raw:`, rawText.slice(0, 400));
+        lastError = 'parse_failed';
+        continue;
+      }
+
+      console.log(`Success with model: ${model}`);
+      break;
+
+    } catch (err) {
+      console.error(`${model} fetch error:`, err.message);
+      lastError = err.message;
+      continue;
     }
+  }
 
-    const geminiJson = await geminiRes.json();
-    const rawText = geminiJson?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    if (!rawText) {
-      console.error('Gemini returned empty text. Full response:', JSON.stringify(geminiJson).slice(0, 500));
-      return json({ error: 'AI returned an empty response. Please try again.' }, 502);
-    }
-
-    geminiResponse = extractJSON(rawText);
-
-    if (!geminiResponse) {
-      console.error('JSON extraction failed. Raw text (first 600 chars):', rawText.slice(0, 600));
-      return json({ error: 'AI response could not be parsed. Please try again — it usually works on a second attempt.' }, 502);
-    }
-
-  } catch (err) {
-    console.error('Gemini fetch/parse error:', err.message);
-    return json({ error: 'Failed to reach AI service. Please try again.' }, 500);
+  if (!geminiResponse) {
+    return json({ error: 'All AI models are currently busy. Please try again in a moment.' }, 503);
   }
 
   // ─── INCREMENT USAGE ──────────────────────────────────────────────────────────
@@ -123,10 +150,6 @@ function json(data, status = 200) {
   });
 }
 
-/**
- * Extracts a JSON object from text that may contain extra content.
- * Tries multiple strategies to handle all the ways Gemini wraps output.
- */
 function extractJSON(text) {
   if (!text || typeof text !== 'string') return null;
 
